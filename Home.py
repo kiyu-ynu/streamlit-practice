@@ -5,8 +5,5 @@ st.title("ゲームアプリへようこそ！")
 st.write("このアプリでは、さまざまなゲームを楽しむことができます。")
 
 st.write("これからも新しいゲームを追加していく予定です。")
-
-st.link_button(
-    "遊び方",
-    "https://github.com/kiyu-ynu/streamlit-practice/blob/main/README.md",
-)
+st.write("以下のURLからゲームの種類と遊び方を確認できます。")
+st.write("[ゲームの種類と遊び方]()")

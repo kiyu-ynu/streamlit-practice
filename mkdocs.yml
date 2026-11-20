@@ -1,11 +1,11 @@
-site_name: Quiz App
+site_name: Game App by tk
 site_url: https://kiyu-ynu.github.io/streamlit-practice/
 theme:
   name: mkdocs
 nav: 
   - Home: index.md
-  - about: about.md
-  - Quiz App: how_to_use/quiz_app.md
+  - High Low Game: how_to_use/high_low_game.md
+  - Quiz: how_to_use/quiz_app.md
 repo_url: https://github.com/kiyu-ynu/streamlit-practice
 extra:
   version:
