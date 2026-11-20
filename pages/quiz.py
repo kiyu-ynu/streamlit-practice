@@ -1,10 +1,38 @@
 
 import streamlit as st
+import streamlit.components.v1 as components
 import random
 import json
 from pathlib import Path
 
 st.title("Let's Play Quiz!")
+
+if st.session_state.pop("scroll_to_top", False):
+    components.html(
+        """
+        <script>
+        const scrollToTop = () => {
+            const parentWindow = window.parent;
+            const parentDocument = parentWindow.document;
+
+            parentWindow.scrollTo(0, 0);
+            parentDocument.documentElement.scrollTop = 0;
+            parentDocument.body.scrollTop = 0;
+
+            for (const element of parentDocument.querySelectorAll(
+                "[data-testid='stAppViewContainer'], [data-testid='stMain'], .main"
+            )) {
+                element.scrollTop = 0;
+            }
+        };
+
+        setTimeout(scrollToTop, 50);
+        setTimeout(scrollToTop, 300);
+        </script>
+        """,
+        height=0,
+    )
+
 st.write("すべての問題に回答して、最後に採点ボタンを押してください。")
 
 # JSONファイルを読み込む
@@ -26,6 +54,7 @@ if "selected_numbers" not in st.session_state:
         list(questions.keys()),
         min(QUESTION_COUNT, len(questions))
     )
+    st.session_state.selected_numbers.sort(key=int)
 
 # 採点済みかどうかを記録
 if "submitted" not in st.session_state:
@@ -117,4 +146,5 @@ if st.session_state.submitted:
         del st.session_state.selected_numbers
         del st.session_state.submitted
         st.session_state.pop("score", None)
+        st.session_state.scroll_to_top = True
         st.rerun()
