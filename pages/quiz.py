@@ -4,7 +4,7 @@ import random
 import json
 from pathlib import Path
 
-st.title("クイズアプリにようこそ！")
+st.title("Let's Play Quiz!")
 st.write("すべての問題に回答して、最後に採点ボタンを押してください。")
 
 # JSONファイルを読み込む
@@ -15,6 +15,10 @@ with open(json_path, "r", encoding="utf-8") as f:
 
 # 出題する問題数
 QUESTION_COUNT = 5
+
+# 問題セットごとにウィジェットを区別する
+if "quiz_round" not in st.session_state:
+    st.session_state.quiz_round = 0
 
 # 最初にランダムで問題を選ぶ
 if "selected_numbers" not in st.session_state:
@@ -40,7 +44,7 @@ for index, number in enumerate(st.session_state.selected_numbers):
         options=[1, 2, 3, 4],
         format_func=lambda x, choices=q["選択肢"]: f"{x}. {choices[str(x)]}",
         index=None,
-        key=f"answer_{number}",
+        key=f"answer_{st.session_state.quiz_round}_{number}",
         disabled=st.session_state.submitted
     )
 
@@ -53,7 +57,9 @@ if not st.session_state.submitted:
 
         unanswered = [
             number for number in st.session_state.selected_numbers
-            if st.session_state.get(f"answer_{number}") is None
+            if st.session_state.get(
+                f"answer_{st.session_state.quiz_round}_{number}"
+            ) is None
         ]
 
         if unanswered:
@@ -66,7 +72,10 @@ if not st.session_state.submitted:
 
                 q = questions[number]
 
-                if st.session_state[f"answer_{number}"] == q["正解"]:
+                answer_key = (
+                    f"answer_{st.session_state.quiz_round}_{number}"
+                )
+                if st.session_state[answer_key] == q["正解"]:
                     score += 1
 
             st.session_state.score = score
@@ -86,7 +95,8 @@ if st.session_state.submitted:
     for index, number in enumerate(st.session_state.selected_numbers):
 
         q = questions[number]
-        answer = st.session_state[f"answer_{number}"]
+        answer_key = f"answer_{st.session_state.quiz_round}_{number}"
+        answer = st.session_state[answer_key]
 
         if answer == q["正解"]:
             st.success(f"第{index + 1}問：正解！")
@@ -96,3 +106,15 @@ if st.session_state.submitted:
         st.write(
             f"正解は {q['正解']}番の {q['選択肢'][str(q['正解'])]} です。"
         )
+
+    # リセット
+    if st.button("もう一度"):
+        st.session_state.quiz_round += 1
+        for key in list(st.session_state.keys()):
+            if key.startswith("answer_"):
+                del st.session_state[key]
+
+        del st.session_state.selected_numbers
+        del st.session_state.submitted
+        st.session_state.pop("score", None)
+        st.rerun()
